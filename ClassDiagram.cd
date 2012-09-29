@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="_min.Models.BaseDriverMySql">
+    <Position X="9" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="_min.Models.BaseDriverMySql.QueryType" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Models\BaseDriverMySql.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Enum Name="_min.Models.BaseDriverMySql.Expectations" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Models\BaseDriverMySql.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAIAAAEACAEAAACCEBAAQAAAAAAACIEAAAJAA=</HashCode>
+      <FileName>Models\BaseDriverMySql.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="_min.App" Collapsed="true">
+    <Position X="13" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="_min.MainWindow" Collapsed="true">
+    <Position X="13" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="_min.Models.Architect" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="14.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAYCAAAAACAAAAAAABAAgAQAAAAAAAAhAAAAAE=</HashCode>
+      <FileName>Models\Architect.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="_min.Models.ConditionMySql" BaseTypeListCollapsed="true">
+    <Position X="14.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAACAAEAAAAAAA=</HashCode>
+      <FileName>Models\ConditionMySql.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="_min.Models.Control">
+    <Position X="0.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAACAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Models\Control.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="_min.Models.TreeControl">
+    <Position X="0.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABIAAAACAAAAAAA=</HashCode>
+      <FileName>Models\Control.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="_min.Models.Field">
+    <Position X="13" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIgAIAABCAASAAAAAAAAAAQAAAACAAAAAQIIAAAAA=</HashCode>
+      <FileName>Models\Field.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="_min.Models.FKField">
+    <Position X="11.5" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAAAAAAAAAAAAACAAAAAAAAAAgAA=</HashCode>
+      <FileName>Models\Field.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="_min.Models.M2NMappingField">
+    <Position X="15.25" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAQAAAQAAAAAAAAAAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Field.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="_min.Models.FKMySql">
+    <Position X="3.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AUBAAAQIAACAAAAAAAAAAAiAAAAAAABAAAAAAAgBAAA=</HashCode>
+      <FileName>Models\FKMySql.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="_min.Models.M2NMappingMySql">
+    <Position X="3.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAwABACAAAAEAAABAQAAAAAAAAAA=</HashCode>
+      <FileName>Models\FKMySql.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="_min.Models.Panel" BaseTypeListCollapsed="true">
+    <Position X="18.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAgAABAAACRAAAAAAAAACIAAACABAAAQKIAAAAA=</HashCode>
+      <FileName>Models\Panel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="_min.Models.StatsMySql">
+    <Position X="7" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAICABAAAAAAAAAAAAAAAAAAAAAAAAAAABAAI=</HashCode>
+      <FileName>Models\StatsMySql.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="_min.Models.SystemDriverMySql">
+    <Position X="11" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgEAECAUAAIAwAACAACAAAgQAAAAQACAAABEQCAA=</HashCode>
+      <FileName>Models\SystemMySql.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="_min.Models.WebDriver">
+    <Position X="9" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAEABAA=</HashCode>
+      <FileName>Models\WebDriver.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="_min.Properties.Resources" Collapsed="true">
+    <Position X="16.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="_min.Properties.Settings" Collapsed="true">
+    <Position X="13" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAABAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="_min.Interfaces.ICondition">
+    <Position X="14.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IFK">
+    <Position X="5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AUAAAAQIAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAgBAAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IM2NMapping">
+    <Position X="5" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAgABACAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IPanel">
+    <Position X="18.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAgAABAAACRAAAAAAAAACIAAACABAAAQKIAAAAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IField">
+    <Position X="13" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAIAABCAASAAAAAAAAAAQAAAACAAAAAQIIAAAAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IControl">
+    <Position X="16.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAAAACAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IBaseDriver">
+    <Position X="3" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAAAAAEBAAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IWebDriver">
+    <Position X="3" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAEABAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IStats">
+    <Position X="5.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAICAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAI=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IArchitect">
+    <Position X="13" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAgAAAAAAACAAgAAAAAE=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.ISystemDriver">
+    <Position X="0.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAUAAIAQAAAAACAAAgQAAAAQAAAAABEQCAA=</HashCode>
+      <FileName>Interfaces\Models.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.Presenter" Collapsed="true">
+    <Position X="20" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAACAAIAAAAAAAAAAAAAAABAAA=</HashCode>
+      <FileName>Interfaces\Presenters.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="_min.Interfaces.IView" Collapsed="true">
+    <Position X="18.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AGAAAAAAAAAAAAASABAAAAAAAAAEAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>Interfaces\Views.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

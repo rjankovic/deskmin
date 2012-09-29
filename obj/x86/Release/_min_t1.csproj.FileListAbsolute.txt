@@ -1,0 +1,10 @@
+C:\CS\_min_t1\_min_t1\obj\x86\Release\ResolveAssemblyReference.cache
+C:\CS\_min_t1\_min_t1\obj\x86\Release\MainWindow.baml
+C:\CS\_min_t1\_min_t1\obj\x86\Release\MainWindow.g.cs
+C:\CS\_min_t1\_min_t1\obj\x86\Release\App.g.cs
+C:\CS\_min_t1\_min_t1\obj\x86\Release\_min_t1_MarkupCompile.cache
+C:\CS\_min_t1\_min_t1\obj\x86\Release\_min_t1.g.resources
+C:\CS\_min_t1\_min_t1\obj\x86\Release\_min.Properties.Resources.resources
+C:\CS\_min_t1\_min_t1\obj\x86\Release\GenerateResource.read.1.tlog
+C:\CS\_min_t1\_min_t1\obj\x86\Release\GenerateResource.write.1.tlog
+C:\CS\_min_t1\_min_t1\bin\Release\_min_t1.exe.config

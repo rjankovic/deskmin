@@ -1,0 +1,27 @@
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\bin\Debug\_min_t1.exe
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\bin\Debug\_min_t1.pdb
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\MainWindow.baml
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\MainWindow.g.cs
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\App.g.cs
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\_min_t1_MarkupCompile.cache
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\_min_t1.g.resources
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\_min_t1.Properties.Resources.resources
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\_min_t1.exe
+C:\Users\RJ\AppData\Local\Temporary Projects\_min_t1\obj\x86\Debug\_min_t1.pdb
+C:\CS\_min_t1\_min_t1\bin\Debug\_min_t1.exe.config
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\_min_t1.exe
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\_min_t1.pdb
+C:\CS\_min_t1\_min_t1\bin\Debug\_min_t1.exe
+C:\CS\_min_t1\_min_t1\bin\Debug\_min_t1.pdb
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\MainWindow.baml
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\MainWindow.g.cs
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\App.g.cs
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\_min_t1_MarkupCompile.cache
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\_min_t1.g.resources
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\CS\_min_t1\_min_t1\obj\x86\Debug\_min.Properties.Resources.resources
