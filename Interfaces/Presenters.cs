@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using _min.Interfaces;
+using _min.Common;
 
 namespace _min.Interfaces
 {

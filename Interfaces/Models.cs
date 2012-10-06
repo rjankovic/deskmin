@@ -7,12 +7,12 @@ using _min.Common;
 namespace _min.Interfaces
 {
 
-    interface ICondition
+    public interface ICondition
     {
         string Translate();
     }
 
-    interface IFK 
+    public interface IFK 
     {
         string refTable { get; }
         string myTable { get; }
@@ -24,7 +24,7 @@ namespace _min.Interfaces
         bool validateInput(string inputValue);
     }
 
-    interface IM2NMapping : IFK {
+    public interface IM2NMapping : IFK {
         string mapTable { get; }
         // column in the mapping table that reffers to ref_table
         string mapRefColumn { get; }
@@ -33,14 +33,8 @@ namespace _min.Interfaces
         bool validateWholeInput(List<string> inputValues);
     }
 
-    interface IPanel        // bez dat, tie pripajat vo view (?) 
+    public interface IPanel        // no data included, will be added in the presenter 
     {
-        /*
-         Dictionary<string, object> attr;
-         Dictionary<string, object> state; (?)
-         Panel[] children;
-         int Dock ( = parent field_id)
-         */
         DataRow PK { get; }
         int panelId { get; }
         string typeName { get; }
@@ -55,16 +49,22 @@ namespace _min.Interfaces
         List<IField> fields { get; }    // vratane dockov
         List<IControl> controls { get; }
         
-        void AddChildren(List<IPanel> children);
+        void AddChildren(List<IPanel> children);        // none of these must overwrite already existing object / property
+        void AddFields(List<IField> fields);
+        void AddControls(List<IControl> controls);
+        void AddViewAttr(object key, object value);
+        void AddControlAttr(object key, object value);
+        
         void SetCreationId(int id);
+        void SetParentPanel(IPanel parent);
     }
 
-    interface IField {
+    public interface IField {
         //attrs readonly
         int fieldId { get; }   // just for initialization of a newly created field, probably to be removed later
         string column { get; }
         string typeName { get; }
-        int panelId { get; }
+        int panelId { get; set; }
         int typeId { get; }
         PropertyCollection attr { get; }
         PropertyCollection rules { get; }
@@ -75,14 +75,23 @@ namespace _min.Interfaces
         void SetCreationId(int id);
     }
 
-    interface IControl { 
+    public interface IFKField : IField {
+        IFK fk { get; }
+    }
+
+    public interface IM2NMappingField : IField
+    {
+        IM2NMapping mapping { get; }
+    }
+
+    public interface IControl { 
     // type {UserAction}, attr - value; readonly
         DataTable data { get; set;  }
         List<string> PKColNames { get; } // action parameter
         UserAction action { get; }
     }
 
-    interface IBaseDriver 
+    public interface IBaseDriver 
     {
         // + constructor from connection
         // 3 connections total
@@ -92,19 +101,16 @@ namespace _min.Interfaces
         int query(params object[] parts);   // returns rows affected
     }
 
-    interface IWebDriver : IBaseDriver     // webDB
+    public interface IWebDriver : IBaseDriver     // webDB
     {
 
         void FillPanel(IPanel panel);
         int insertPanel(IPanel panel, DataRow values);  // returns insertedId
         void updatePanel(IPanel panel, DataRow values);
-        void deletePanel(IPanel panel);
-        // ICondition - rozsah/zhoda retazca/cisla (Match)
-        //DataTable getPanelList(int idPanel, ICondition[] conditions = null, 
-        //    DataColumn[] orderBy = null, int limit = 0);   
+        void deletePanel(IPanel panel);   
     }
 
-    interface IStats : IBaseDriver {    // information_schema
+    public interface IStats : IBaseDriver {    // information_schema
         DataColumnCollection columnTypes(string tableName);
         List<IFK> foreignKeys(string tableName);
         List<List<string>> indexes(string tableName);
@@ -112,29 +118,27 @@ namespace _min.Interfaces
         List<string> TwoColumnTables();
         List<string> TableList();
         List<IM2NMapping> findMappings();
-        DateTime TableCreation(string tableName);
-        //...
+        DateTime TableCreation(string tableName);//...
     }
 
-    interface IArchitect  // systemDB, does not fill structures with data
+    public interface IArchitect  // systemDB, does not fill structures with data
     {
-        DataSet getArchitecture();
         IPanel getArchitectureInPanel();        // hierarchia - vnutorne vola getPanel
 
         IPanel propose();   // for the whole site
         IPanel proposeForTable(string tableName);
         bool checkPanelProposal(IPanel proposal, bool recursive = true);
-        bool checkPanelProposal(int panelId, bool recursive = true);
-        //...
+        bool checkPanelProposal(int panelId, bool recursive = true);    // load from db
+        bool checkProposal();       // for the whole project, load from db
     }
 
-    interface ISystemDriver : IBaseDriver // systemDB
+    public interface ISystemDriver : IBaseDriver // systemDB
     {
         void saveLog();
         void logUserAction(DataRow data);
         bool isUserAuthorized(int panelId, UserAction act);
         void doRequests();
-        IPanel getPanel(string tableName, bool recursive = true, IPanel parent = null);
+        IPanel getPanel(string tableName, UserAction action, bool recursive = true, IPanel parent = null);
         IPanel getPanel(int panelId, bool recursive = true, IPanel parent = null);
         IPanel getArchitectureInPanel();
         void addPanel(IPanel panel, bool recursive = true);
@@ -144,7 +148,10 @@ namespace _min.Interfaces
         Common.Environment.User getUser(string userName, string password);
         Common.Environment.Project getProject(int projectId);
         
-        public Dictionary<PanelTypes, int> PanelTypeNameIdMap();
-        public Dictionary<FieldTypes, int> FieldTypeNameIdMap();
+        Dictionary<PanelTypes, int> PanelTypeNameIdMap();
+        Dictionary<FieldTypes, int> FieldTypeNameIdMap();
+        
+        bool ProposalExists();
+        DataTable fetchBaseNavControlTable();   // the DataTable for main TreeControl / MenuDrop
     }
 }

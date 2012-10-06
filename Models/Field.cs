@@ -15,7 +15,7 @@ namespace _min.Models
         public string typeName {get; private set;}
         public int typeId { get; private set; }
         public string errMsg { get; private set; }
-        public int panelId { get; private set; }
+        public int panelId { get; set; }        // TODO add safety
         public PropertyCollection attr { get; private set; }
         public PropertyCollection rules {get; private set; }
         public virtual object value { get; set; }
@@ -32,6 +32,7 @@ namespace _min.Models
             this.rules = rules==null?new PropertyCollection():rules;
             value = null;
             errMsg = "";
+            
         }
 
         //todo validation
@@ -50,22 +51,24 @@ namespace _min.Models
         public void SetCreationId(int id)
         {
             if (fieldId == 0) fieldId = id;
+            else
             throw new Exception("Field id already initialized");
         }
     }
 
-    class FKField : Field 
+    class FKField : Field, IFKField
     {
+        private object _value;
         public override object value 
         {
             get {
-                return value;
+                return _value;
             }
             set {
-                if (!(value is string))
-                    throw new ArgumentException("Value of a mapping field must be string");
+                if (!(value is string) && !(value == null))
+                    throw new ArgumentException("Value of a mapping field must be string or null");
                 else
-                    this.value = value;   
+                    this._value = value;   
             } 
         }
         public IFK fk { get; private set; }
@@ -83,18 +86,19 @@ namespace _min.Models
         }   
     }
 
-    class M2NMappingField : Field
+    class M2NMappingField : Field, IM2NMappingField
     {
+        private object _value;
         public override object value
         {
             get {
-                return value;
+                return _value;
             }
             set {
-                if (!(value is List<string>))
-                    throw new ArgumentException("Value of a mapping field must be List<string>");
+                if (!(value is List<string>) && !(value == null))
+                    throw new ArgumentException("Value of a mapping field must be List<string> or null");
                 else
-                    this.value = value;
+                    this._value = value;
             }
         }
         public IM2NMapping mapping { get; private set; }

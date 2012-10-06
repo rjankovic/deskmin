@@ -25,7 +25,7 @@ namespace _min.Models
         public string myColumn { get; private set; }
         public string refTable { get; private set; }
         public string refColumn { get; private set; }
-        public string displayColumn { get; private set; }
+        public string displayColumn { get; set; }
         public Dictionary<string, int> options { get; private set; }
 
 

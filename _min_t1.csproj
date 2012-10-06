@@ -93,7 +93,7 @@
     <Compile Include="Models\SystemMySql.cs" />
     <Compile Include="Models\ConditionMySql.cs" />
     <Compile Include="Models\StatsMySql.cs" />
-    <Compile Include="Models\WebDriver.cs" />
+    <Compile Include="Models\WebDriverMySql.cs" />
     <Compile Include="Models\Control.cs" />
     <Compile Include="Models\Panel.cs" />
     <Compile Include="Models\Field.cs" />

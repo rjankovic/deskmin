@@ -46,6 +46,7 @@ namespace _min.Models
         }
 
         public static string escape(object o) {
+            if (o == null) return " NULL ";
             if (o is DateTime) return String.Format("'{0:yyyy-MM-dd HH:mm:ss}'", (DateTime)o);
             //if (o is double || o is long) return o.ToString();
             double parsed;
@@ -58,6 +59,7 @@ namespace _min.Models
             switch (firstWord.ToUpper())
             {
                 case "SELECT":
+                case "SHOW":
                     return QueryType.Select;
                 case "INSERT":
                     return QueryType.Insert;
@@ -107,6 +109,10 @@ namespace _min.Models
                         }
                     }
                 }
+                else
+                    if(part is int || part is long || part is float || part is double){
+                        resultQuery.Append(" " + part + " ");
+                    }
                 else{
                     bool handled = false;
                     object dictionarizedPart = part;
@@ -301,7 +307,7 @@ namespace _min.Models
 
         public int NextId(string tableName) {
             DataRow status = fetch("SHOW TABLE STATUS LIKE '" + tableName + "'");
-            return (int)status["Auto_increment"];
+            return Convert.ToInt32(status["Auto_increment"]);
         }
 
     }

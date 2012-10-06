@@ -126,6 +126,10 @@ namespace _min.Models
 
             return res;
         }
+
+        public DataTable fetchBaseNavControlTable() { 
+            return fetchAll("SELECT id_panel, id_parent, table_name AS name FROM panels");      // get a real unique panel name
+        }
         
         private DataSet getPanelHierarchy() {   //TODO cache?
             DataTable panels = fetchAll("SELECT id_panel, table_name, id_parent FROM panels " 
@@ -187,10 +191,14 @@ namespace _min.Models
             
             //determine the controls
             List<Control> controls = new List<Control>();       // TODO rewrite into enum over PanelTypes
-            switch((string)panelRow["type_name"]){
+            string pTypeStr = (string)panelRow["type_name"];
+            switch(pTypeStr){
                 case Constants.PANEL_EDITABLE:      // standard edit window
+                case Constants.PANEL_NAVTABLE:
                     foreach(UserAction action in Enum.GetValues(typeof(UserAction))){
-                        if(action == UserAction.View) continue;
+                        if((action == UserAction.View && pTypeStr == Constants.PANEL_EDITABLE)
+                            || (action == UserAction.Update && pTypeStr == Constants.PANEL_NAVTABLE
+                        ) ) continue;
                         string actionName = action.ToString();
                         string controlCaption = (string)controlProperties[actionName];      //!!
                         if(controlCaption != CC.CONTROL_DISABLED && 
@@ -200,10 +208,9 @@ namespace _min.Models
                     }
                     break;
                 case CC.PANEL_MONITOR:   // just display, no controls
-                    break;               
+                    break;
                 case CC.PANEL_MENUDROP:  // the contol is the whole panel, do not load data
                 case CC.PANEL_MENUTABS:       // will be a field type
-                case CC.PANEL_NAVTABLE:
                 case CC.PANEL_NAVTREE:
                     string localActionName = UserAction.View.ToString();
 
@@ -215,14 +222,8 @@ namespace _min.Models
                         List<string> displayColumns = new List<string>(     // table structure for summary
                             (viewProperties[CC.PANEL_DISPLAY_COLUMN_ORDER] as string).Split(','));      // already in database - only first few columns
                         string panelTypeName = (string)panelRow["type_name"];
-                        if (panelTypeName == CC.PANEL_NAVTABLE)     // usual navigation table
-                        {
-                            foreach(string s in displayColumns.Take((int)viewProperties[CC.NAVTAB_COLUMNS_DISLAYED])){
-                                controlTabStruct.Columns.Add(s);
-                            }
-                            controls.Add(new Control(controlTabStruct, PKColNames, UserAction.View));
-                        }
-                        else if (panelTypeName == CC.PANEL_MENUTABS)
+
+                        if (panelTypeName == CC.PANEL_MENUTABS)
                         {  // will take data from children (captions as panel Names) 
                             controlTabStruct.Columns.Add("childPanelName");
                             controls.Add(new Control(controlTabStruct, "childPanelName", UserAction.View));
@@ -252,14 +253,15 @@ namespace _min.Models
             return res;
         }
 
-        public IPanel getPanel(string tableName, bool recursive = true, IPanel parent = null)
+        public IPanel getPanel(string tableName, UserAction action, bool recursive = true, IPanel parent = null)
         {
-            int panelId = (int)fetchSingle("SELECT id_panel FROM panels WHERE table_name = '" + tableName 
-                + "' AND id_project = ", CE.project.id);
+            int panelId = (int)fetchSingle("SELECT id_panel FROM panels JOIN panel_types USING(id_type) WHERE table_name = '" + tableName 
+                + "' AND id_project = ", CE.project.id, " AND type_name = '" + action.ToString() + "'");
+            
             return getPanel(panelId, recursive, parent);
         }
 
-        public IPanel getArchitectureInPanel() {        // make sure there is only one panel with id_parent = NULL
+        public IPanel getArchitectureInPanel() {        // !!! make sure there is only one panel with id_parent = NULL
             int basePanelId = (int)fetchSingle("SELECT id_panel FROM panels WHERE id_parent IS NULL AND id_project = ", 
                 CE.project.id);
             return getPanel(basePanelId, true);
@@ -275,14 +277,14 @@ namespace _min.Models
             foreach(string key in panel.controlAttr.Keys){
                 insertVals["name"] = key;
                 insertVals["val"] = panel.controlAttr[key].ToString();
-                query("REPLACE INTO panel_meta ", insertVals);
+                query("REPLACE INTO panels_meta ", insertVals);
             }
 
             insertVals["concerns"] = CC.ATTR_VIEW;
             foreach(string key in panel.viewAttr.Keys){
                 insertVals["name"] = key;
                 insertVals["val"] = panel.viewAttr[key].ToString();
-                query("REPLACE INTO panel_meta ", insertVals);
+                query("REPLACE INTO panels_meta ", insertVals);
             }
         }
 
@@ -295,22 +297,32 @@ namespace _min.Models
                 insertVals["id_holder"] = panel.viewAttr["id_holder"];
             }
             insertVals["id_type"] = panel.typeId;
-            insertVals["type_name"] = panel.typeName;
+            //insertVals["type_name"] = panel.typeName;     // duplicite - only in panel object
             insertVals["table_name"] = panel.tableName;
             if(panel.parent != null)
-                insertVals["id_parent"] = panel.parent;
-            insertVals["pk_column_names"] = String.Join(",", panel.PKColNames);
-            
+                insertVals["id_parent"] = panel.parent.panelId;
+            if (panel.PKColNames != null)
+            {
+                insertVals["pk_column_names"] = String.Join(",", panel.PKColNames);
+            }
             StartTransaction();
             panel.SetCreationId(NextId("panels"));
             query("INSERT INTO panels ", insertVals);
             CommitTransaction();
 
+            foreach (IField field in panel.fields) {
+                field.panelId = panel.panelId;
+                AddField(field);
+            }
+
             RewritePanelProperties(panel);
 
             if (recursive) {
                 foreach (IPanel child in panel.children)
+                {
+                    child.SetParentPanel(panel);
                     addPanel(child, true);
+                }
             }
         }
 
@@ -323,12 +335,18 @@ namespace _min.Models
                 updateVals["id_holder"] = panel.viewAttr["id_holder"];
             }
             updateVals["id_type"] = panel.typeId;
-            updateVals["type_name"] = panel.typeName;
+            //updateVals["type_name"] = panel.typeName;     // duplicate - only in panel object
             updateVals["table_name"] = panel.tableName;
             if (panel.parent != null)
                 updateVals["id_parent"] = panel.parent;
-            updateVals["pk_column_names"] = String.Join(",", panel.PKColNames);
+            if (panel.PKColNames.Count > 0)
+                updateVals["pk_column_names"] = String.Join(",", panel.PKColNames);
             query("UPDATE panels SET", updateVals, "WHERE id_panel = ", panel.panelId);
+
+            foreach (IField field in panel.fields)
+            {
+                updateField(field);
+            }
 
             RewritePanelProperties(panel);
             if (recursive) {
@@ -350,7 +368,7 @@ namespace _min.Models
             
             insertVals["id_panel"] = field.panelId;
             insertVals["id_type"] = typeId;     // TODO store type id?
-            insertVals["column_name"] = field.column;
+            insertVals["table_column"] = field.column;
             
             StartTransaction();
             int fieldId = NextId("fields");
@@ -446,13 +464,13 @@ namespace _min.Models
 
         public CE.Project getProject(int projectId) { 
             CE.Project project = new CE.Project();
-            DataRow row = fetch("SELECT * FROM project WHERE id_project = ", projectId);
+            DataRow row = fetch("SELECT * FROM projects WHERE id_project = ", projectId);
             project.id = projectId;
             project.lastChange = (DateTime)row["last_modified"];
             project.name = (string)row["name"];
-            project.serverName = (string)row["server_name"];
+            project.serverName = (string)row["server_type"];
             project.connstringIS = (string)row["connstring_information_schema"];
-            project.connstringWeb = (string)row["consstring_web"];
+            project.connstringWeb = (string)row["connstring_web"];
             return project;
         }
 
@@ -474,6 +492,12 @@ namespace _min.Models
                 res.Add((FieldTypes)Enum.Parse(typeof(FieldTypes), row["type_name"] as string), (int)row["id_type"]);
             }
             return res;
+        }
+
+        public bool ProposalExists() {
+            object res = fetchSingle("SELECT COUNT(*) FROM panels WHERE id_project = ", CE.project.id);
+            
+            return (Convert.ToInt32(res) > 0);
         }
     }
 }

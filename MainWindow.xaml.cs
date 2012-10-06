@@ -16,6 +16,9 @@ using System.Windows.Shapes;
 using MySql.Data.MySqlClient;
 using MySql;
 using _min.Models;
+using _min.Interfaces;
+using CE = _min.Common.Environment;
+using CC = _min.Common.Constants;
 
 namespace _min
 {
@@ -33,6 +36,7 @@ namespace _min
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
+            /*
             string connstring = "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=ks;pooling=false";
             DataTable log = new DataTable();
             log.Columns.Add(new DataColumn("query", typeof(string)));
@@ -85,8 +89,19 @@ namespace _min
                 }
             }
 
-
+            */
             
+            StatsMySql stats = new StatsMySql(
+                "ks", "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=information_schema;pooling=false");
+            SystemDriverMySql sysDriver = new SystemDriverMySql(
+                "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=deskmin;pooling=false");
+            CE.project = sysDriver.getProject(2);
+            WebDriverMySql webDriver = new WebDriverMySql(
+                "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=ks;pooling=false");
+            Architect architect = new Architect(sysDriver, stats);
+            
+            IPanel proposal = architect.propose();
+
             /*
             DataRow row = tab.Rows[0];
             foreach(DataColumn col in row.Table.Columns){

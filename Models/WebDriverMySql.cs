@@ -7,10 +7,10 @@ using _min.Interfaces;
 
 namespace _min.Models
 {
-    class WebDriver : BaseDriverMySql, IWebDriver
+    class WebDriverMySql : BaseDriverMySql, IWebDriver
     {
 
-        public WebDriver(string connstring, DataTable logTable = null)
+        public WebDriverMySql(string connstring, DataTable logTable = null)
             : base(connstring, logTable)
         { }
 
