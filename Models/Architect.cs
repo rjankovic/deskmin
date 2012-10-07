@@ -56,7 +56,28 @@ namespace _min.Models
     }
 
     public delegate void ArchitectureError(IArchitect sender, ArchitectureErrorEventArgs e);
+
     
+    public class ArchitectWarningEventArgs : ArchitectureErrorEventArgs
+    {
+        public ArchitectWarningEventArgs(string message, string tableName)
+            : base(message, tableName)
+        { }
+    }
+
+    public delegate void ArchitectWarning(IArchitect sender, ArchitectWarningEventArgs e);
+
+    
+    public class ArchitectNoticeEventArgs : ArchitectureErrorEventArgs
+    {
+        public ArchitectNoticeEventArgs(string message, string tableName = null)
+            : base(message, tableName)
+        { }
+    }
+
+    public delegate void ArchitectNotice(IArchitect sender, ArchitectNoticeEventArgs e);
+
+
 
     class Architect : IArchitect
     {
@@ -83,10 +104,13 @@ namespace _min.Models
         public object questionAnswer;
         public event ArchitectQuestion Question;
         public event ArchitectureError Error;
+        public event ArchitectWarning Warning;
+        public event ArchitectNotice Notice;
 
         private ISystemDriver systemDriver;
         private IStats stats;
         private List<IM2NMapping> mappings;
+        private List<IM2NMapping> usedMappings;
         private Dictionary<PanelTypes, int> panelTypeIdMp;
         private Dictionary<FieldTypes, int> fieldTypeIdMap;
 
@@ -95,6 +119,7 @@ namespace _min.Models
             this.stats = stats;
             this.systemDriver = system;
             this.mappings = stats.findMappings();
+            this.usedMappings = new List<IM2NMapping>();
             panelTypeIdMp = system.PanelTypeNameIdMap();
             fieldTypeIdMap = system.FieldTypeNameIdMap();
             questionAnswer = null;
@@ -129,13 +154,32 @@ namespace _min.Models
             DataColumnCollection cols = stats.columnTypes(tableName);
             List<IFK> FKs = stats.foreignKeys(tableName);
             List<string> PKCols = stats.primaryKeyCols(tableName);
+            while(PKCols.Count == 0) 
+            {
+                Dictionary<string, object> options = new Dictionary<string, object>();
+                options.Add("Try again", 1);
+                options.Add("Ommit table", 2);
+
+                ArchitectQuestionEventArgs args = new ArchitectQuestionEventArgs(
+                    "The table " + tableName + " does not have a primary key defined and therefore "
+                    + "cannot be used in the administration. Is this intentional or will you add the primary key?",
+                    options);
+                Question(this, args);
+                int answer = (int)questionAnswer;
+                if (answer == 1)
+                    PKCols = stats.primaryKeyCols(tableName);
+                else
+                    return null;
+            }
+
+
             if (cols.Count == 2 && FKs.Count == 2) return null; // seems like mapping table
             // FK ~> mapping ?
             
             List<IField> fields = new List<IField>();
 
             foreach (IM2NMapping mapping in mappings) {
-                if (mapping.myTable == tableName)
+                if (mapping.myTable == tableName && !usedMappings.Exists(m => mapping = m))
                     // && (stats.TableCreation(mapping.myTable) > stats.TableCreation(mapping.refTable)
                     // the later-created table would get to edit the mapping
                     // but I`d better ask the user
@@ -151,9 +195,8 @@ namespace _min.Models
                         + " is likely to  be a M to N mapping between this table and " + mapping.refTable
                         + ". Do you want to include an interface to manage this mapping in this panel?",
                         options);
-                    //Question(this, args); // ask questions!
-                    //int answer = (int)questionAnswer;
-                    int answer = 1;
+                    Question(this, args); // ask questions!
+                    int answer = (int)questionAnswer;
                     if(answer == 1 || answer == 2){
                     // no potentional field from cols is removed by this, though
                     List<string> displayColOrder = DisplayColOrder(mapping.refTable);
@@ -162,7 +205,7 @@ namespace _min.Models
                         FieldTypes.M2NMapping.ToString(), 0, mapping));
                     }
                     if(answer == 2){
-                        mappings.Remove(mapping);
+                        usedMappings.Add(mapping);
                     }
                 }
             }
@@ -178,7 +221,6 @@ namespace _min.Models
             // editable fields in the order as defined in table; don`t edit AI
             foreach (DataColumn col in cols) {
                 PropertyCollection validation = new PropertyCollection();
-                PropertyCollection attr = new PropertyCollection();
                 
                 if (!col.ExtendedProperties.ContainsKey(CC.COLUMN_EDITABLE)) continue;
                 if(!col.AllowDBNull) validation.Add(CC.RULES_REQUIRED, true);
@@ -206,7 +248,14 @@ namespace _min.Models
                     else fieldType = FieldTypes.Date;
                     validation.Add(fieldType.ToString(), true);
                 }
-                else{
+                else if (col.DataType == typeof(Enum)) {
+                    // cannot happen, since column properties are taken from Stats
+                    if (!col.ExtendedProperties.ContainsKey(CC.COLUMN_ENUM_VALUES))
+                        throw new Exception("Missing enum options for field " + col.ColumnName);
+                    fieldType = FieldTypes.Enum;    
+                }
+                else
+                {
                     throw new Exception("Unrecognised column type " + col.DataType.ToString());
                 }
                 fields.Add(new Field(0, col.ColumnName, fieldTypeIdMap[fieldType], 
@@ -216,6 +265,7 @@ namespace _min.Models
             // setup controls as properies
             PropertyCollection controlProps = new PropertyCollection();
             PropertyCollection viewProps = new PropertyCollection();
+            viewProps.Add(CC.PANEL_NAME, tableName + " Editation");
 
             List<Control> controls = new List<Control>();
 
@@ -266,13 +316,33 @@ namespace _min.Models
             List<IFK> selfRefs = new List<IFK>(from FK in FKs where FK.myTable == FK.refTable select FK as IFK);
             List<string> PKCols = stats.primaryKeyCols(tableName);
             IFK selfRefFK = null;
+            // strict hierarchy structure validation - not nice => no Tree
+
+            string hierarchyExplanation = "(For a tree-like navigation within view, the table must have exactly one FK pointing "
+                + " to it`s PK column. (It can of course have other FKs refering to other tables.))"; 
+            
             if (selfRefs.Count > 1)
-                throw new Exception("Unexpected hierarchy table structure for " + tableName + " - multiple self-referential columns");
-            else if (selfRefs.Count == 1){
+                Warning(this, new ArchitectWarningEventArgs(
+                    "Unexpected hierarchy table structure for " + tableName + " - multiple self-referential columns. " 
+                    + hierarchyExplanation, tableName));
+            else
+            if (selfRefs.Count == 1 && PKCols.Count == 1){
                 selfRefFK = selfRefs.First();
-                if(PKCols.Count > 1) throw new Exception("Hierarchical table " + tableName + " must have a signle-column PK");
-                if(selfRefFK.refColumn != PKCols[0]) throw new Exception("The self-referential FK in table " 
-                    + tableName + " must refer to the PK column." );
+
+                if (PKCols.Count > 1)
+                {
+                    Warning(this, new ArchitectWarningEventArgs(
+                    "Hierarchical table " + tableName + " does have a signle-column PK. "
+                    + hierarchyExplanation, tableName));
+                    selfRefFK = null;       // remove the selfRefFK => as if there was no hierarchy
+                }
+                if (selfRefFK.refColumn != PKCols[0])
+                {
+                    selfRefFK = null;
+                    Warning(this, new ArchitectWarningEventArgs("The self-referential FK in table " 
+                        + tableName + " must refer to the PK column. " 
+                        + hierarchyExplanation, tableName));
+                }
             }
             List<string> displayColOrder = DisplayColOrder(tableName);
 
@@ -280,6 +350,7 @@ namespace _min.Models
             PropertyCollection displayProps = new PropertyCollection();
 
             displayProps.Add(CC.PANEL_DISPLAY_COLUMN_ORDER, String.Join(",", displayColOrder));
+            displayProps.Add(CC.PANEL_NAME, tableName);
             controlProps.Add(UserAction.View.ToString() + CC.CONTROL_ACCESS_LEVEL_REQUIRED_SUFFIX, 1);
             IControl control;
             DataTable controlTab = new DataTable();
@@ -335,6 +406,7 @@ namespace _min.Models
         /// <returns>IPanel</returns>
         public IPanel propose()
         {
+            Notice(this, new ArchitectNoticeEventArgs("Starting proposal..."));
             if (systemDriver.ProposalExists()) {
                 Dictionary<string, object> options = new Dictionary<string,object>();
                 options.Add("Repropose", true);
@@ -350,13 +422,23 @@ namespace _min.Models
             List<string> tables = stats.TableList();
             List<IPanel> baseChildren = new List<IPanel>();
             foreach (string tableName in tables) {
+                Notice(this, new ArchitectNoticeEventArgs("Exploring table " + tableName + "..."));
                 IPanel editPanel = proposeForTable(tableName);
-                if(editPanel != null){      // editable panel available - add summary panel
+                if (editPanel != null)
+                {      // editable panel available - add summary panel
+                    Notice(this, new ArchitectNoticeEventArgs("Table " + tableName + " will be editable."));
                     IPanel summaryPanel = proposeSummaryPanel(tableName);
+                    Notice(this, new ArchitectNoticeEventArgs("Proposed summary navigation panel for table " + tableName + "."));
                     baseChildren.Add(editPanel);
                     baseChildren.Add(summaryPanel);
                 }
+                else 
+                {
+                    Notice(this, new ArchitectNoticeEventArgs("Table " + tableName + " is probably NOT suitable for direct management."));
+                }
             }
+            Notice(this, new ArchitectNoticeEventArgs("Creating navigation base with " +
+                baseChildren.Count + " options (2 per table)."));
             IPanel basePanel = new Panel(null, 0, panelTypeIdMp[PanelTypes.MenuDrop], PanelTypes.MenuDrop.ToString(), 
                 baseChildren, null, null, null);
             systemDriver.addPanel(basePanel);
@@ -371,7 +453,7 @@ namespace _min.Models
             basePanel.AddControls(addedList);
 
             basePanel.AddControlAttr(CC.NAV_THROUGH_PANELS, true);
-            basePanel.AddControlAttr(UserAction.View.ToString(), "Main menu");
+            basePanel.AddViewAttr(CC.PANEL_NAME, "Main menu");
             basePanel.AddControlAttr(UserAction.View.ToString() + CC.CONTROL_ACCESS_LEVEL_REQUIRED_SUFFIX, 1);
 
             systemDriver.updatePanel(basePanel, false); // children aren`t changed, just adding a control for the basePanel
@@ -388,6 +470,7 @@ namespace _min.Models
         /// <param name="recursive">run itself on panel children</param>
         /// <returns>true if no errors found, true othervise</returns>
         public bool checkPanelProposal(IPanel proposalPanel, bool recursive = true)
+            // non-recursive checking after the initial check - after panel modification
         {
             string messageBeginning = "In panel " + ( proposalPanel.viewAttr.ContainsKey(CC.PANEL_NAME) ? 
                 ( proposalPanel.viewAttr[CC.PANEL_NAME] + " (" + proposalPanel.tableName + ") " ) :
@@ -454,7 +537,7 @@ namespace _min.Models
                             if (isNavTable) throw new Exception("Cannot display a M2NMapping in NavTable");
                             IM2NMapping thisMapping = ((IM2NMappingField)field).mapping;
                             if (!mappings.Contains(thisMapping))
-                            {       //TODO: override List<IM2NMapping>.Contains for equality determination 
+                            {        
                                 Error(this, new ArchitectureErrorEventArgs(messageBeginning + "the schema " +
                                     "does not define an usual M2NMapping batween tables " + thisMapping.myTable +
                                     " and " + thisMapping.refTable + " using " + thisMapping.mapTable + 
@@ -466,7 +549,7 @@ namespace _min.Models
                         {
                             IFK fieldFK = ((IFKField)field).fk;
                             if (!FKs.Contains(fieldFK)) 
-                            {       //TODO: override List<IFK>.Contains for equality determination 
+                            {        
                                 Error(this, new ArchitectureErrorEventArgs(messageBeginning + "the column " + field.column
                                 + " is not a foreign key representable by the FK field", proposalPanel, field));
                                 good = false;

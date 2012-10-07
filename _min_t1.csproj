@@ -79,6 +79,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Common\Environment.cs" />
+    <Compile Include="Common\Functions.cs" />
     <Compile Include="Interfaces\Presenters.cs" />
     <Compile Include="Interfaces\Views.cs" />
     <Compile Include="Interfaces\Models.cs" />

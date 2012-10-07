@@ -83,7 +83,8 @@ namespace _min.Models
         public override bool ValidateSelf()
         {
             return fk.validateInput((string)value);
-        }   
+        }
+
     }
 
     class M2NMappingField : Field, IM2NMappingField

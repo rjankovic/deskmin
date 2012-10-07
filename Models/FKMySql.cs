@@ -10,7 +10,7 @@ using System.Data;
 
 namespace _min.Models
 {
-    class FKMySql : IFK
+    class FKMySql : IFK, IEquatable<FKMySql>
     {
         public BaseDriverMySql driver { 
             get {
@@ -71,10 +71,34 @@ namespace _min.Models
                 options.Add((string)row[0], (int)row[1]);
             }
         }
+
+        // initially redefined becase of Architect.checkPanelProposal checking whether matching FKs still exist in the db
+        public bool Equals(FKMySql other)
+        {
+            if (other == null) return false;
+
+            return this.displayColumn == other.displayColumn
+                && this.myColumn == other.myColumn
+                && this.myTable == other.myTable
+                && this.refColumn == other.refColumn
+                && this.refTable == other.refTable;
+        }
+
+        public override bool Equals(Object obj)
+        {
+            if (obj == null)
+                return false;
+
+            FKMySql FKObj = obj as FKMySql;
+            if (FKObj == null)
+                return false;
+            else
+                return Equals(FKObj);
+        }   
     }
 
 
-    class M2NMappingMySql : FKMySql, IM2NMapping
+    class M2NMappingMySql : FKMySql, IM2NMapping, IEquatable<M2NMappingMySql>
     {
         public string mapTable { get; private set; }
         public string mapRefColumn {get; private set;}
@@ -130,6 +154,31 @@ namespace _min.Models
                 row[1] = val;
                 driver.query("INSERT INTO `", mapTable, row);
             }
+        }
+
+
+        // initial redefined becase of Architect.checkPanelProposal checking whether matching FKs still exist in the db
+        public bool Equals(M2NMappingMySql other)
+        {
+            if (other == null) return false;
+
+            return
+                ((this as FKMySql).Equals(other as FKMySql))
+                && this.mapMyColumn == other.mapMyColumn
+                && this.mapRefColumn == other.mapRefColumn
+                && this.mapTable == other.mapTable;
+        }
+
+        public override bool Equals(Object obj)
+        {
+            if (obj == null)
+                return false;
+
+            M2NMappingMySql M2NObj = obj as M2NMappingMySql;
+            if (M2NObj == null)
+                return false;
+            else
+                return Equals(M2NObj);
         }
     }
 

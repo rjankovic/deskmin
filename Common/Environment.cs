@@ -10,7 +10,7 @@ namespace _min.Common
     public enum UserAction { View, Insert, Update, Delete }
     public enum AppRequest { ArchitectureReload, StopLogging, StartLogging }
     public enum PanelTypes { Editable, NavTable, NavTree, MenuDrop, MenuTabs, Monitor, Container }
-    public enum FieldTypes { FK, M2NMapping, Date, DateTime, Time, Holder, Varchar, Text, Decimal, Ordinal, Bool }
+    public enum FieldTypes { FK, M2NMapping, Date, DateTime, Time, Holder, Varchar, Text, Decimal, Ordinal, Bool, Enum }
 
     public static class Environment
     {
@@ -81,6 +81,9 @@ namespace _min.Common
         // end depreceated
 
         public const string PANEL_NAME = "panelName";
+
+        // "a","bbb","c"... - view attr; one day this shall change to a control attr
+        public const string COLUMN_ENUM_VALUES = "ColumnEnumValues";
 
         public const string FIELD_REF_TABLE = "refTable";   // FK
         public const string FIELD_REF_COLUMN = "refColumn";

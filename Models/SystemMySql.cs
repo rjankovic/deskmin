@@ -131,7 +131,7 @@ namespace _min.Models
             return fetchAll("SELECT id_panel, id_parent, table_name AS name FROM panels");      // get a real unique panel name
         }
         
-        private DataSet getPanelHierarchy() {   //TODO cache?
+        private DataSet getPanelHierarchy() {
             DataTable panels = fetchAll("SELECT id_panel, table_name, id_parent FROM panels " 
             + " JOIN panel_types USING(id_panel) WHERE id_project = ", CE.project.id);
             panels.TableName = "panels";
@@ -170,9 +170,8 @@ namespace _min.Models
 
             PropertyCollection viewProperties = new PropertyCollection();
             PropertyCollection controlProperties = new PropertyCollection();
-            // !! attr to handle global validation rules needed?
+            // !! attrs to handle global validation rules needed?
             
-            //if((int?)panelRow["holder"] != null) viewProperties["holder"] = (int)panelRow["holder"];
 
             DataTable propsTab = fetchAll("SELECT name, val, concerns FROM panels_meta WHERE id_panel = ", panelId);  
             
@@ -190,7 +189,7 @@ namespace _min.Models
                 }
             
             //determine the controls
-            List<Control> controls = new List<Control>();       // TODO rewrite into enum over PanelTypes
+            List<Control> controls = new List<Control>();       // TODO (probably don`t) rewrite into enum over PanelTypes
             string pTypeStr = (string)panelRow["type_name"];
             switch(pTypeStr){
                 case Constants.PANEL_EDITABLE:      // standard edit window
@@ -367,7 +366,7 @@ namespace _min.Models
             
             
             insertVals["id_panel"] = field.panelId;
-            insertVals["id_type"] = typeId;     // TODO store type id?
+            insertVals["id_type"] = typeId;
             insertVals["table_column"] = field.column;
             
             StartTransaction();

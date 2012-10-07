@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using _min.Interfaces;
+using System.Reflection;
 
 namespace _min.Models
 {
@@ -26,7 +27,7 @@ namespace _min.Models
                 col.ExtendedProperties.Add(Common.Constants.FIELD_POSITION, Convert.ToInt32(r["ORDINAL_POSITION"]));
                 string typeStr = r["DATA_TYPE"] as string;      // set DataType
                 Type representedType = typeof(object);
-                if (typeStr.EndsWith("text") || typeStr.EndsWith("char") || typeStr == "enum") {        // handling enum this way shall be depreceated 
+                if (typeStr.EndsWith("text") || typeStr.EndsWith("char") || typeStr == "enum") { 
                     representedType = typeof(string);
                     col.ExtendedProperties.Add("length", Convert.ToInt32(r["CHARACTER_MAXIMUM_LENGTH"]));
                 }
@@ -56,7 +57,17 @@ namespace _min.Models
                         representedType = typeof(double);
                         break;
                     default:
-                        throw new Exception("Unrecognised column type: " + typeStr);
+                        if(typeStr.StartsWith("ënum"))
+                        {
+                            typeStr = typeStr.Remove(0, "enum('".Length);
+                            // and hopefully replace `'` with `"`
+                            typeStr = typeStr.Remove(typeStr.Length-1, 1).Replace("\"", "\\\"").Replace("'", "\"");
+                            col.DataType = typeof(Enum);
+                            col.ExtendedProperties.(Common.Constants.COLUMN_ENUM_VALUES, typeStr);
+                        }
+                        else
+                            throw new Exception("Unrecognised column type: " + typeStr);
+                        break;
                 }
                 col.DataType = representedType;
                 
@@ -66,24 +77,16 @@ namespace _min.Models
                 if(!col.AutoIncrement)
                     col.ExtendedProperties.Add(Common.Constants.COLUMN_EDITABLE, true); // TODO add more restrictive rules...
 
-                string colDefault = r["COLUMN_DEFAULT"] as string;      // set DefaultValue
-                if (colDefault != "") {
-                    switch (colDefault) {
-                        case null:
-                            if(!col.AutoIncrement)
-                                col.DefaultValue = null;
-                            break;
-                        case "CURRENT_TIMESTAMP":
-                            col.ExtendedProperties.Remove(Common.Constants.COLUMN_EDITABLE);
-                            //props["Editable"] = false;
-                            break;
-                        default:
-                            //if( col.DataType == typeof(DateTime) ) col.DefaultValue = DateTime.Parse(colDefault);
-                            // finish..
-                            //col.DefaultValue = Convert.ChangeType(colDefault, col.DataType);
-                            //col.DefaultValue = col.DataType.colDefault;       // TODO improve ? 
-                            //DateTime.par
-                            break;
+                object colDefault = r["COLUMN_DEFAULT"];      // set DefaultValue
+                if(!((colDefault is DBNull) || (colDefault.ToString() == String.Empty))){
+                    string colDefaltStr = colDefault as string;
+                    if(colDefaltStr == "CURRENT_TIMESTAMP")
+                        col.ExtendedProperties.Remove(Common.Constants.COLUMN_EDITABLE);
+                    else{
+                       object parsed;
+                       if(Common.Functions.TryTryParse(colDefaltStr, col.DataType, out parsed){
+                            col.DefaultValue = parsed;
+                       }
                     }
                 }
 
@@ -127,7 +130,6 @@ namespace _min.Models
             DataTable stats = fetchAll("SELECT COLUMN_NAME FROM KEY_COLUMN_USAGE WHERE CONSTRAINT_SCHEMA = \""
                 + webDb + "\" AND TABLE_NAME = \"" + tableName + "\" AND CONSTRAINT_NAME = \"PRIMARY\" "
                 + " GROUP BY CONSTRAINT_NAME ORDER BY ORDINAL_POSITION");
-            if (stats.Rows.Count == 0) throw new Exception("The table " + tableName + " has no primary key defined");
             return new List<string>(from row in stats.AsEnumerable() select row["COLUMN_NAME"] as string);
         }
 
