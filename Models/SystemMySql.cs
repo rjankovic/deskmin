@@ -498,5 +498,9 @@ namespace _min.Models
             
             return (Convert.ToInt32(res) > 0);
         }
+
+        public void ClearProposal() {
+            query("DELETE FROM panels WHERE id_project = ", CE.project.id);
+        }
     }
 }

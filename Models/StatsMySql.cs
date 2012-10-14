@@ -63,7 +63,7 @@ namespace _min.Models
                             // and hopefully replace `'` with `"`
                             typeStr = typeStr.Remove(typeStr.Length-1, 1).Replace("\"", "\\\"").Replace("'", "\"");
                             col.DataType = typeof(Enum);
-                            col.ExtendedProperties.(Common.Constants.COLUMN_ENUM_VALUES, typeStr);
+                            col.ExtendedProperties.Add(Common.Constants.COLUMN_ENUM_VALUES, typeStr);
                         }
                         else
                             throw new Exception("Unrecognised column type: " + typeStr);
@@ -84,7 +84,7 @@ namespace _min.Models
                         col.ExtendedProperties.Remove(Common.Constants.COLUMN_EDITABLE);
                     else{
                        object parsed;
-                       if(Common.Functions.TryTryParse(colDefaltStr, col.DataType, out parsed){
+                       if(Common.Functions.TryTryParse(colDefaltStr, col.DataType, out parsed)){
                             col.DefaultValue = parsed;
                        }
                     }

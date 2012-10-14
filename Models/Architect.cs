@@ -78,6 +78,7 @@ namespace _min.Models
     public delegate void ArchitectNotice(IArchitect sender, ArchitectNoticeEventArgs e);
 
 
+    public delegate IPanel AsyncProposeCaller();
 
     class Architect : IArchitect
     {
@@ -162,10 +163,11 @@ namespace _min.Models
 
                 ArchitectQuestionEventArgs args = new ArchitectQuestionEventArgs(
                     "The table " + tableName + " does not have a primary key defined and therefore "
-                    + "cannot be used in the administration. Is this intentional or will you add the primary key?",
+                    + "cannot be used in the administration. Is this intentional or will you add the primary key? (OMMIT TABLE)",
                     options);
                 Question(this, args);
-                int answer = (int)questionAnswer;
+                //int answer = (int)questionAnswer;
+                int answer = 2;
                 if (answer == 1)
                     PKCols = stats.primaryKeyCols(tableName);
                 else
@@ -179,7 +181,7 @@ namespace _min.Models
             List<IField> fields = new List<IField>();
 
             foreach (IM2NMapping mapping in mappings) {
-                if (mapping.myTable == tableName && !usedMappings.Exists(m => mapping = m))
+                if (mapping.myTable == tableName && !usedMappings.Exists(m => mapping == m))
                     // && (stats.TableCreation(mapping.myTable) > stats.TableCreation(mapping.refTable)
                     // the later-created table would get to edit the mapping
                     // but I`d better ask the user
@@ -193,10 +195,11 @@ namespace _min.Models
                         "While proposing administration panel for the table " + mapping.myTable
                         + ", the system found out that the table " + mapping.mapTable
                         + " is likely to  be a M to N mapping between this table and " + mapping.refTable
-                        + ". Do you want to include an interface to manage this mapping in this panel?",
+                        + ". Do you want to include an interface to manage this mapping in this panel? (INCLUDE IN THIS PANEL ONLY)",
                         options);
                     Question(this, args); // ask questions!
-                    int answer = (int)questionAnswer;
+                    //int answer = (int)questionAnswer;
+                    int answer = 2;
                     if(answer == 1 || answer == 2){
                     // no potentional field from cols is removed by this, though
                     List<string> displayColOrder = DisplayColOrder(mapping.refTable);
@@ -395,6 +398,8 @@ namespace _min.Models
                 new List<IPanel>(), fields, controls, PKCols, null, displayProps, controlProps); 
         }
 
+
+
         /// <summary>
         /// get both edit and summary panel proposal for editable tables 
         /// and create base Panel with MenuDrop field for each editable table
@@ -412,11 +417,14 @@ namespace _min.Models
                 options.Add("Repropose", true);
                 options.Add("Edit", false);
                 Question(this, new ArchitectQuestionEventArgs("A proposal already exists for this project. \n" +
-                    "Do you want to remove it and propose again or edit the existing proposal?", options));
-                bool repropose = (bool)questionAnswer;
-                if (!repropose) {
+                    "Do you want to remove it and propose again or edit the existing proposal? (REMOVE)", options));
+                //bool repropose = (bool)questionAnswer;
+                bool repropose = true;
+                if (!repropose)
+                {
                     return systemDriver.getArchitectureInPanel();
                 }
+                systemDriver.ClearProposal();
             }
 
             List<string> tables = stats.TableList();

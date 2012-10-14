@@ -33,6 +33,7 @@ namespace _min
             InitializeComponent();
 
         }
+        
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
@@ -90,17 +91,32 @@ namespace _min
             }
 
             */
+
+            textBox2.Text += "Creating basic objects" + Environment.NewLine + Environment.NewLine;
+
+            string dbName = "naborycz";
+
             
             StatsMySql stats = new StatsMySql(
-                "ks", "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=information_schema;pooling=false");
+                dbName, "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=information_schema;pooling=true");
             SystemDriverMySql sysDriver = new SystemDriverMySql(
-                "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=deskmin;pooling=false");
-            CE.project = sysDriver.getProject(2);
+                "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=deskmin;pooling=true");
+            CE.project = sysDriver.getProject(1);
             WebDriverMySql webDriver = new WebDriverMySql(
-                "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=ks;pooling=false");
+                "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=" + dbName + ";pooling=false");
             Architect architect = new Architect(sysDriver, stats);
             
-            IPanel proposal = architect.propose();
+            architect.Notice += new ArchitectNotice(Architect_Notice);
+            architect.Question += new ArchitectQuestion(Architect_Question);
+            architect.Error += new ArchitectureError(Architect_Error);
+            architect.Warning += new ArchitectWarning(Architect_Warning);
+
+            AsyncProposeCaller caller = new AsyncProposeCaller(architect.propose);
+            
+            IAsyncResult asyncResult = caller.BeginInvoke(null, null);
+            //IPanel proposal = architect.propose();
+
+            IPanel proposal = caller.EndInvoke(asyncResult);
 
             /*
             DataRow row = tab.Rows[0];
@@ -114,6 +130,34 @@ namespace _min
             
             
         }
+
+        public delegate void AddArchitectNoticeDelegate(string message);
+
+        private void AddArchitectMessage(string message) {
+            textBox2.Text += message + Environment.NewLine + Environment.NewLine;
+        }
+
+        private void Architect_Notice(IArchitect architect, ArchitectNoticeEventArgs e) {
+            //throw new Exception(e.message);
+            textBox2.Dispatcher.BeginInvoke(new AddArchitectNoticeDelegate(AddArchitectMessage), 
+                System.Windows.Threading.DispatcherPriority.Send, e.message);
+        }
+
+        public void Architect_Question(IArchitect architect, ArchitectQuestionEventArgs e) {
+            textBox2.Dispatcher.BeginInvoke(new AddArchitectNoticeDelegate(AddArchitectMessage), 
+                System.Windows.Threading.DispatcherPriority.Send, e.questionText);
+        }
+
+        public void Architect_Error(IArchitect architect, ArchitectureErrorEventArgs e) {
+            textBox2.Dispatcher.BeginInvoke(new AddArchitectNoticeDelegate(AddArchitectMessage), 
+                System.Windows.Threading.DispatcherPriority.Send, e.message);
+        }
+
+        public void Architect_Warning(IArchitect architect, ArchitectWarningEventArgs e) {
+            textBox2.Dispatcher.BeginInvoke(new AddArchitectNoticeDelegate(AddArchitectMessage), 
+                System.Windows.Threading.DispatcherPriority.Send, e.message);
+        }
+
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {

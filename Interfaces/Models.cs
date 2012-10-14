@@ -68,7 +68,6 @@ namespace _min.Interfaces
         int typeId { get; }
         PropertyCollection attr { get; }
         PropertyCollection rules { get; }
-        bool Validate(object value);
         bool ValidateSelf();
         object value { get; set; }
 
@@ -152,6 +151,7 @@ namespace _min.Interfaces
         Dictionary<FieldTypes, int> FieldTypeNameIdMap();
         
         bool ProposalExists();
+        void ClearProposal();
         DataTable fetchBaseNavControlTable();   // the DataTable for main TreeControl / MenuDrop
     }
 }

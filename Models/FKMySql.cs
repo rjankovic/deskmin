@@ -94,7 +94,12 @@ namespace _min.Models
                 return false;
             else
                 return Equals(FKObj);
-        }   
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
     }
 
 
@@ -179,6 +184,11 @@ namespace _min.Models
                 return false;
             else
                 return Equals(M2NObj);
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 
