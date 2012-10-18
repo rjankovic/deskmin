@@ -19,6 +19,7 @@ using _min.Models;
 using _min.Interfaces;
 using CE = _min.Common.Environment;
 using CC = _min.Common.Constants;
+using System.Threading.Tasks;
 
 namespace _min
 {
@@ -33,7 +34,25 @@ namespace _min
             InitializeComponent();
 
         }
-        
+
+        private IPanel proposal = null;
+
+        StatsMySql stats;
+        SystemDriverMySql sysDriver;
+        WebDriverMySql webDriver;
+        Architect architect;
+
+        public event ArchitectNotice AdditionalArchitectNotice;
+
+
+        private void ProposalReady(IAsyncResult result) {
+            Task<IPanel> taskResult = result as Task<IPanel>;
+            proposal = taskResult.Result;
+            AdditionalArchitectNotice(architect, new ArchitectNoticeEventArgs("Done."));
+            //AdditionalArchitectNotice(architect, new ArchitectNoticeEventArgs("Checking proposal"));
+            //IPanel retrieved = sysDriver.getArchitectureInPanel();
+            //bool correctness = architect.checkProposal();
+        }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
@@ -70,16 +89,18 @@ namespace _min
             }
 
             
-            
-            MySqlConnection conn = new MySqlConnection("Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=ks;pooling=false");
-            MySqlCommand cmd = new MySqlCommand("SELECT * FROM users LIMIT 1", conn);
+            */
+            MySqlConnection conn = new MySqlConnection("Server=109.74.158.75;Uid=django;Pwd=heslo;Database=django;pooling=false");
+            //MySqlCommand cmd = new MySqlCommand("SELECT * FROM users LIMIT 1", conn);
             
             
 
             conn.Open();
-            MySqlDataAdapter adap = new MySqlDataAdapter("SELECT * FROM users LIMIT 1", conn);
+            //MySqlDataAdapter adap = new MySqlDataAdapter("SELECT * FROM users LIMIT 1", conn);
             label1.Content = conn.State.ToString();
             DataTable tab = new DataTable();
+            conn.Close();
+            /*
             adap.Fill(tab);
             textBox2.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
             foreach (DataColumn col in tab.Columns) {
@@ -92,31 +113,61 @@ namespace _min
 
             */
 
-            textBox2.Text += "Creating basic objects" + Environment.NewLine + Environment.NewLine;
+            textBox2.Text += "Creating basic objects" + Environment.NewLine;
 
             string dbName = "naborycz";
 
             
-            StatsMySql stats = new StatsMySql(
+            stats = new StatsMySql(
                 dbName, "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=information_schema;pooling=true");
-            SystemDriverMySql sysDriver = new SystemDriverMySql(
+            sysDriver = new SystemDriverMySql(
                 "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=deskmin;pooling=true");
             CE.project = sysDriver.getProject(1);
-            WebDriverMySql webDriver = new WebDriverMySql(
+            webDriver = new WebDriverMySql(
                 "Server=109.74.158.75;Uid=dotnet;Pwd=dotnet;Database=" + dbName + ";pooling=false");
-            Architect architect = new Architect(sysDriver, stats);
+            architect = new Architect(sysDriver, stats);
+            
             
             architect.Notice += new ArchitectNotice(Architect_Notice);
+            this.AdditionalArchitectNotice += new ArchitectNotice(Architect_Notice);
             architect.Question += new ArchitectQuestion(Architect_Question);
             architect.Error += new ArchitectureError(Architect_Error);
             architect.Warning += new ArchitectWarning(Architect_Warning);
-
-            AsyncProposeCaller caller = new AsyncProposeCaller(architect.propose);
             
-            IAsyncResult asyncResult = caller.BeginInvoke(null, null);
+
+            //AsyncProposeCaller caller = new AsyncProposeCaller(architect.propose);
+            //AsyncCallback callback  = new AsyncCallback(ProposalReady);
+            
+
+
+            Task<IPanel> proposalTask = new Task<IPanel>(()=>
+            {
+                return architect.propose();
+            }
+            
+            );
+
+            proposalTask.ContinueWith((taskResult) => ProposalReady(taskResult));
+
+            proposalTask.Start();
+            
+            
+            /*
+                Task<string> task = new Task<string>((obj) =>
+            {
+                return Work(data);
+            }, state);
+
+            if (callBack != null)
+            {
+                task.ContinueWith((tsk) => callBack(tsk));
+            }
+            */
+            
+            //IAsyncResult asyncResult = caller.BeginInvoke(callback, proposal);
             //IPanel proposal = architect.propose();
 
-            IPanel proposal = caller.EndInvoke(asyncResult);
+            //IPanel proposal = caller.EndInvoke(asyncResult);
 
             /*
             DataRow row = tab.Rows[0];
@@ -134,7 +185,7 @@ namespace _min
         public delegate void AddArchitectNoticeDelegate(string message);
 
         private void AddArchitectMessage(string message) {
-            textBox2.Text += message + Environment.NewLine + Environment.NewLine;
+            textBox2.Text += message + Environment.NewLine;
         }
 
         private void Architect_Notice(IArchitect architect, ArchitectNoticeEventArgs e) {
@@ -162,6 +213,11 @@ namespace _min
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void textBox2_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            textBox2.ScrollToEnd();
         }
 
     }

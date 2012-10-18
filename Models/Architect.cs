@@ -430,25 +430,26 @@ namespace _min.Models
             List<string> tables = stats.TableList();
             List<IPanel> baseChildren = new List<IPanel>();
             foreach (string tableName in tables) {
-                Notice(this, new ArchitectNoticeEventArgs("Exploring table " + tableName + "..."));
+                Notice(this, new ArchitectNoticeEventArgs("Exploring table \"" + tableName + "\"..."));
                 IPanel editPanel = proposeForTable(tableName);
                 if (editPanel != null)
                 {      // editable panel available - add summary panel
-                    Notice(this, new ArchitectNoticeEventArgs("Table " + tableName + " will be editable."));
+                    Notice(this, new ArchitectNoticeEventArgs("Table \"" + tableName + "\" will be editable."));
                     IPanel summaryPanel = proposeSummaryPanel(tableName);
-                    Notice(this, new ArchitectNoticeEventArgs("Proposed summary navigation panel for table " + tableName + "."));
+                    Notice(this, new ArchitectNoticeEventArgs("Proposed summary navigation panel for table \"" + tableName + "\"."));
                     baseChildren.Add(editPanel);
                     baseChildren.Add(summaryPanel);
                 }
                 else 
                 {
-                    Notice(this, new ArchitectNoticeEventArgs("Table " + tableName + " is probably NOT suitable for direct management."));
+                    Notice(this, new ArchitectNoticeEventArgs("Table \"" + tableName + "\" is probably NOT suitable for direct management."));
                 }
             }
             Notice(this, new ArchitectNoticeEventArgs("Creating navigation base with " +
                 baseChildren.Count + " options (2 per table)."));
             IPanel basePanel = new Panel(null, 0, panelTypeIdMp[PanelTypes.MenuDrop], PanelTypes.MenuDrop.ToString(), 
                 baseChildren, null, null, null);
+            Notice(this, new ArchitectNoticeEventArgs("Updating database..."));
             systemDriver.addPanel(basePanel);
             DataTable basePanelTreeControlData = systemDriver.fetchBaseNavControlTable();
             IControl basePanelTreeControl = new TreeControl(basePanelTreeControlData, "id_panel", "id_parent", "name", UserAction.View);
@@ -463,7 +464,7 @@ namespace _min.Models
             basePanel.AddControlAttr(CC.NAV_THROUGH_PANELS, true);
             basePanel.AddViewAttr(CC.PANEL_NAME, "Main menu");
             basePanel.AddControlAttr(UserAction.View.ToString() + CC.CONTROL_ACCESS_LEVEL_REQUIRED_SUFFIX, 1);
-
+            
             systemDriver.updatePanel(basePanel, false); // children aren`t changed, just adding a control for the basePanel
             return basePanel;
         }
